@@ -1,0 +1,61 @@
+import unittest
+import json
+import glob
+import os
+import selenium
+
+
+class TestJobOutput(unittest.TestCase):
+
+    test_output_path = '#ENV#'
+
+    def test_ml_model_accuracy(self):
+        '''
+        Todo: Use DB REST API to execute validation notebooks with asserts
+        '''
+        self.assertTrue('FOO'.isupper())
+        self.assertFalse('Foo'.isupper())
+
+
+    def test_allLookupsExist(self):
+        '''
+        Todo: Use  to connect to S3 and validate parquet files exists
+        '''
+        self.assertTrue('FOO'.isupper())
+        self.assertFalse('Foo'.isupper())
+
+    def test_performance(self):
+        path = self.test_output_path
+        statuses = []
+
+        for filename in glob.glob(os.path.join(path, '*.json')):
+            print('Evaluating: ' + filename)
+            data = json.load(open(filename))
+            duration = data['execution_duration']
+            if duration > 100000:
+                status = 'FAILED'
+            else:
+                status = 'SUCCESS'
+
+            statuses.append(status)
+
+        self.assertFalse('FAILED' in statuses)
+
+    def test_job_run(self):
+        path = self.test_output_path
+        statuses = []
+
+        for filename in glob.glob(os.path.join(path, '*.json')):
+            print('Evaluating: ' + filename)
+            data = json.load(open(filename))
+            status = data['state']['result_state']
+            statuses.append(status)
+
+        self.assertFalse('FAILED' in statuses)
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+
+

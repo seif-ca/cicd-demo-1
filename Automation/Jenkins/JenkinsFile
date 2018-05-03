@@ -1,0 +1,45 @@
+JenkinsFile
+
+node {
+    def GIT_REPO        = "/var/jenkins_home/workspace/Promote_to_QA_Pipeline"
+    def GITHUB_CRED_ID  = "ed8e4789-4e44-430f-932b-abe3adf2f090"
+    def CURRENT_RELEASE = "Release/v1.1"
+    def DB_CRED_ID      = "7b99fc8f-179d-420d-bfd2-f5d79b27788c"
+    def DB_SHARD        = "tamisin-sandbox"
+    def LOCALPATH       = "${GIT_REPO}/Workspace"
+    def WORKSPACEPATH   = "/QA"
+    def TESTPATH        = "${GIT_REPO}/Validation/Tests"
+    def OUTFILEPATH     = "Validation/Output"
+    def SLACK_URL        = "https://hooks.slack.com/services/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"
+    def SLACK_CHANNEL   = "#databricks"
+
+    stage('Synchronize Code') { // for display purposes
+        echo "Pulling ${CURRENT_RELEASE} Branch from Github"
+        git branch: CURRENT_RELEASE, credentialsId: GITHUB_CRED_ID, url: 'https://github.com/tamisin-sandbox/databricks_cicd.git'
+    }
+    stage('Deploy Changes') {
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DB_CRED_ID,
+                                                                  usernameVariable: 'DB_USER',
+                                                                  passwordVariable: 'DB_PASSWORD']]) {
+            sh "python3 ${GIT_REPO}/Automation/Deployments/deploy.py  --shard=${DB_SHARD} --username=$DB_USER --password=$DB_PASSWORD --localpath=${LOCALPATH} --workspacepath=${WORKSPACEPATH}"
+        }
+    }
+    stage('Execute Tests') {
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DB_CRED_ID,
+                                                                  usernameVariable: 'DB_USER',
+                                                                  passwordVariable: 'DB_PASSWORD']]) {
+            sh "python3 ${GIT_REPO}/Automation/Deployments/run.py --shard=${DB_SHARD} --username=$DB_USER --password=$DB_PASSWORD --localpath=${LOCALPATH} --workspacepath=${WORKSPACEPATH} --outfilepath=${GIT_REPO}/${OUTFILEPATH}"
+        }
+        sh "sed -i -e 's #ENV# ${GIT_REPO}/${OUTFILEPATH} g' ${TESTPATH}/test.py"
+
+        sh "python3 -m pytest --junit-xml=${GIT_REPO}/${OUTFILEPATH}/results.xml ${TESTPATH}/test.py || true"
+
+        sh "python3 ${GIT_REPO}/Automation/Deployments/notify.py --slackurl=${SLACK_URL} --message='${env.JOB_NAME}:Build-${env.BUILD_NUMBER}' --channel=${SLACK_CHANNEL} --outputpath=${GIT_REPO}/${OUTFILEPATH}"
+
+    }
+    stage('Evaluate Results') {
+        sh "find ${GIT_REPO}/${OUTFILEPATH} -name '*.json' -exec gzip --verbose {} \\;"
+        sh "touch ${GIT_REPO}/${OUTFILEPATH}/results.xml"
+        junit "${OUTFILEPATH}/*.xml"
+    }
+}
