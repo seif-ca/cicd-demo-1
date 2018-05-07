@@ -1,5 +1,3 @@
-JenkinsFile
-
 node {
     def GIT_REPO        = "/var/jenkins_home/workspace/Promote_to_QA_Pipeline"
     def GITHUB_CRED_ID  = "ed8e4789-4e44-430f-932b-abe3adf2f090"
