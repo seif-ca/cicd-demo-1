@@ -4,6 +4,7 @@ import glob
 import os
 
 
+
 class TestJobOutput(unittest.TestCase):
 
     test_output_path = '#ENV#'
