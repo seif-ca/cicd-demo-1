@@ -2,7 +2,6 @@ import unittest
 import json
 import glob
 import os
-import selenium
 
 
 class TestJobOutput(unittest.TestCase):
