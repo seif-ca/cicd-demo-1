@@ -15,3 +15,5 @@ val suppDf = sqlContext.read
          .load("/databricks-datasets/tpch/data-001/supplier/")
 
 suppDf.createOrReplaceTempView("V_SUPPLIERS")
+
+display(suppDf)
