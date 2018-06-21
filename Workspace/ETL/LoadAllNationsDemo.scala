@@ -28,6 +28,7 @@ val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("R
                         .select(nationsDf("NationKey"), nationsDf("Name").as("NationName"), regionsDf("RegionKey"), regionsDf("Name").as("RegionName"))
 
 joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
+// this is a test
 
 // COMMAND ----------
 
