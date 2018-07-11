@@ -25,9 +25,11 @@ val regionsDf = sqlContext.read
          .load("/databricks-datasets/tpch/data-001/region/")
 
 val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("RegionKey"), "inner")
-                        .select(nationsDf("NationKey"), nationsDf("Name").as("Nation_Name"), regionsDf("RegionKey"), regionsDf("Name").as("RegionName"))
+                        .select(nationsDf("NationKey"), nationsDf("Name").as("NationName"), regionsDf("RegionKey"), regionsDf("Name").as("RegionName"))
 
 joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
+// this is a test
+// This is a demo
 
 // COMMAND ----------
 
