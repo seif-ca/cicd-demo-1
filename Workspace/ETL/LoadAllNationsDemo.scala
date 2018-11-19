@@ -15,6 +15,7 @@ val nationsDf = sqlContext.read
 
 /* this is a test */
 
+/* this is another test */
 case class RegionSchema(RegionKey: Int, Name: String, Comment: String)
 
 var regionSchema = Encoders.product[RegionSchema].schema
