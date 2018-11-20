@@ -70,7 +70,7 @@ def deploy_path(shard, username, password, localpath, dbfspath):
             fulldbfspath = fulldbfspath.replace(os.sep, '/')
 
             name, file_extension = os.path.splitext(fullpath)
-            if file_extension.lower() in ['.scala', '.sql', '.r', '.py', '.sh']:
+            if file_extension.lower() in ['.scala', '.sql', '.r', '.py', '.sh', '.jar']:
                 row = [fullpath, fulldbfspath]
                 sourcefiles.append(row)
 
