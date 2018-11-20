@@ -113,7 +113,7 @@ def deploy_dbfs(shard, username, password, sourcefiles):
             # workpath removes extension
             fulldbfspath = dbfspath + '/' + nameonly
 
-            if file_extension.lower() in ['scala', 'sql', 'r', 'py', 'sh']:
+            if file_extension.lower() in ['scala', 'sql', 'r', 'py', 'sh', 'jar']:
                 print('Importing file:' + fullpath + ' to DBFS path:' + fulldbfspath)
                 files = {'content': open(fullpath, 'rb')}
                 values = {'path': fulldbfspath, 'overwrite': 'true'}
