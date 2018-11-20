@@ -13,22 +13,22 @@ def main():
     username = ''
     password = ''
     localpath = ''
-    workspacepath = ''
+    dbfspath = ''
     releasefile = ''
     outfilepath = ''
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hs:u:p:lwfo',
-                                   ['shard=', 'username=', 'password=', 'localpath=', 'workspacepath=', 'releasefile=', 'outfilepath='])
+                                   ['shard=', 'username=', 'password=', 'localpath=', 'dbfspath=', 'releasefile=', 'outfilepath='])
     except getopt.GetoptError:
         print(
-            'run.py -u <username> -p <password> -s <shard> -l <localpath> -w <workspacepath> -f <releasefile> -o <outfilepath>)')
+            'run.py -u <username> -p <password> -s <shard> -l <localpath> -w <dbfspath> -f <releasefile> -o <outfilepath>)')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == '-h':
             print(
-                'run.py -u <username> -p <password> -s <shard> -l <localpath> -w <workspacepath> -f <releasefile> -o <outfilepath>')
+                'run.py -u <username> -p <password> -s <shard> -l <localpath> -w <dbfspath> -f <releasefile> -o <outfilepath>')
             sys.exit()
         elif opt in ('-s', '--shard'):
             shard = arg
@@ -38,8 +38,8 @@ def main():
             password = arg
         elif opt in ('-l', '--localpath'):
             localpath = arg
-        elif opt in ('-w', '--workspacepath'):
-            workspacepath = arg
+        elif opt in ('-w', '--dbfspath'):
+            dbfspath = arg
         elif opt in ('-f', '--releasefile'):
             releasefile = arg
         elif opt in ('-o', '--outfilepath'):
@@ -48,7 +48,7 @@ def main():
     print('-s is ' + shard)
     print('-u is ' + username)
     print('-l is ' + localpath)
-    print('-w is ' + workspacepath)
+    print('-w is ' + dbfspath)
     print('-f is ' + releasefile)
     print('-o is ' + outfilepath)
 
@@ -56,55 +56,56 @@ def main():
     if localpath != '' and releasefile != '':
         print('localpath and releasefile as mutally excluisive as releasefile contains localpath')
         print(
-            'run.py -u <username> -p <password> -s <shard> (-l <localpath> -w <workspacepath>) or (-f <releasefile>)')
+            'run.py -u <username> -p <password> -s <shard> (-l <localpath> -w <dbfspath>) or (-f <releasefile>)')
         sys.exit()
     elif localpath != '':
-        run_path(shard, username, password, localpath, workspacepath, outfilepath)
+        run_path(shard, username, password, localpath, dbfspath, outfilepath)
     elif releasefile != '':
         run_file(shard, username, password, localpath, outfilepath)
 
 
-def run_path(shard, username, password, localpath, workspacepath, outfilepath):
+def run_path(shard, username, password, localpath, dbfspath, outfilepath):
     # Generate array from walking local path
-    notebooks = []
+    sourcefiles = []
     for path, subdirs, files in os.walk(localpath):
         for name in files:
-            fullpath = path + '/' + name
-            # removes localpath to repo but keeps workspace path
-            fullworkspacepath = workspacepath + path.replace(localpath, '')
+            fullpath = path + os.sep + name
+            # removes localpath to repo but keeps dbfs path
+            fulldbfspath = dbfspath + path.replace(localpath, '')
+            fulldbfspath = fulldbfspath.replace(os.sep, '/')
 
             name, file_extension = os.path.splitext(fullpath)
             if file_extension.lower() in ['.scala', '.sql', '.r', '.py']:
-                row = [fullpath, fullworkspacepath, 1]
-                notebooks.append(row)
+                row = [fullpath, fulldbfspath, 1]
+                sourcefiles.append(row)
 
-    run(shard, username, password, notebooks, outfilepath)
+    run(shard, username, password, sourcefiles, outfilepath)
 
 def run_file(shard, username, password, releasefile, outfilepath):
     # Generate array from file
 
-    notebooks = []
+    sourcefiles = []
     with open(releasefile) as csvfile:
         reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)  # change contents to floats
         for row in reader:  # each row is a list
-            notebooks.append(row)
+            sourcefiles.append(row)
 
-    run(shard, username, password, notebooks, outfilepath)
+    run(shard, username, password, sourcefiles, outfilepath)
 
 
-def run(shard, username, password, notebooks, outfilepath):
+def run(shard, username, password, sourcefiles, outfilepath):
     # run each element in array
-    for notebook in notebooks:
-        nameonly = os.path.basename(notebook[0])
-        workspacepath = notebook[1]
+    for sourcefile in sourcefiles:
+        nameonly = os.path.basename(sourcefile[0])
+        dbfspath = sourcefile[1]
 
         name, file_extension = os.path.splitext(nameonly)
 
         # workpath removes extension
-        fullworkspacepath = workspacepath + '/' + name
+        fulldbfspath = 'dbfs:' + dbfspath + '/' + nameonly
 
-        print('Running job for:' + fullworkspacepath)
-        values = {'run_name': name, 'existing_cluster_id': '0907-163941-coop741', 'timeout_seconds': 3600, 'notebook_task': {'notebook_path': fullworkspacepath}}
+        print('Running job for:' + fulldbfspath)
+        values = {'run_name': name, 'existing_cluster_id': '0410-142436-shoos167', 'timeout_seconds': 3600, 'spark_python_task': {'python_file': fulldbfspath}}
 
         resp = requests.post('https://' + shard + '.cloud.databricks.com/api/2.0/jobs/runs/submit',
                              data=json.dumps(values), auth=(username, password))
@@ -128,7 +129,7 @@ def run(shard, username, password, notebooks, outfilepath):
             i=i+1
 
         if outfilepath != '':
-            file = open(outfilepath + '/' +  str(runid) + '.json', 'w')
+            file = open(outfilepath + os.sep +  str(runid) + '.json', 'w')
             file.write(json.dumps(j))
             file.close()
 
