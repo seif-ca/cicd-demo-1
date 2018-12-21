@@ -33,6 +33,8 @@ val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("R
 joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 // this is a test
 // This is a demo
+//again and again
+
 
 // COMMAND ----------
 
