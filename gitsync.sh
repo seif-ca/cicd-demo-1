@@ -1,4 +1,5 @@
 git checkout develop
+
 git pull
 databricks workspace export_dir -o /DEVELOP .
 
