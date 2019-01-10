@@ -1,4 +1,4 @@
-// Databricks notebook source
+# Databricks notebook source
 import org.apache.spark.sql.Encoders
 
 case class NationSchema(NationKey: Int, Name: String, RegionKey: Int,
@@ -13,9 +13,6 @@ val nationsDf = sqlContext.read
          .option("delimiter", "|")
          .load("/databricks-datasets/tpch/data-001/nation/")
 
-/* this is a test */
-
-/* this is another test */
 case class RegionSchema(RegionKey: Int, Name: String, Comment: String)
 
 var regionSchema = Encoders.product[RegionSchema].schema
@@ -33,14 +30,6 @@ val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("R
 joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 // this is a test
 // This is a demo
-//again and again
 
+# COMMAND ----------
 
-// COMMAND ----------
-
-val allNations = sqlContext.sql("SELECT * from V_ALL_NATIONS v JOIN iso_country_codes i on upper(v.NationName) = upper(i.name)")
- display(allNations) 
-
-// COMMAND ----------
-
-allNations.write.csv("/tmp/foo.csv")

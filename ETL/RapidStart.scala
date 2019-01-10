@@ -1,4 +1,43 @@
 // Databricks notebook source
+// MAGIC %sql
+// MAGIC SHOW tables
+
+// COMMAND ----------
+
+val same_query_as_above = sqlContext.sql("show tables")
+display(same_query_as_above)
+
+// COMMAND ----------
+
+val names = sqlContext.sql("select sum(count) as cnt, first_name from tbl_baby_names group by first_name")
+names.show()
+
+// COMMAND ----------
+
+// MAGIC %fs ls
+
+// COMMAND ----------
+
+val ls = dbutils.fs.ls("/")
+display(ls)
+
+// COMMAND ----------
+
+dbutils.fs.help()
+
+// COMMAND ----------
+
+val sparkDF = spark.read.format("parquet")
+.option("header", "true")
+.option("inferSchema", "true")
+.load("/SEARCHES")
+
+// COMMAND ----------
+
+display(sparkDF)
+
+// COMMAND ----------
+
 import org.apache.spark.sql.Encoders
 
 case class NationSchema(NationKey: Int, Name: String, RegionKey: Int,
@@ -13,9 +52,6 @@ val nationsDf = sqlContext.read
          .option("delimiter", "|")
          .load("/databricks-datasets/tpch/data-001/nation/")
 
-/* this is a test */
-
-/* this is another test */
 case class RegionSchema(RegionKey: Int, Name: String, Comment: String)
 
 var regionSchema = Encoders.product[RegionSchema].schema
@@ -30,17 +66,13 @@ val regionsDf = sqlContext.read
 val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("RegionKey"), "inner")
                         .select(nationsDf("NationKey"), nationsDf("Name").as("NationName"), regionsDf("RegionKey"), regionsDf("Name").as("RegionName"))
 
-joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
-// this is a test
-// This is a demo
-//again and again
 
+joinedDf.write.csv("/tmp/nations.csv")
 
 // COMMAND ----------
 
-val allNations = sqlContext.sql("SELECT * from V_ALL_NATIONS v JOIN iso_country_codes i on upper(v.NationName) = upper(i.name)")
- display(allNations) 
+// MAGIC %sh wget dbfs:/tmp/rows.json "https://health.data.ny.gov/api/views/jxy9-yhdk/rows.json?accessType=DOWNLOAD"
 
 // COMMAND ----------
 
-allNations.write.csv("/tmp/foo.csv")
+// MAGIC %fs ls dbfs:/tmp
