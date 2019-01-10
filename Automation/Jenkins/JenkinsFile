@@ -1,11 +1,14 @@
 node {
-    def GIT_REPO        = "/var/jenkins_home/workspace/Promote_to_QA_Pipeline"
-    def GITHUB_CRED_ID  = "ed8e4789-4e44-430f-932b-abe3adf2f090"
-    def CURRENT_RELEASE = "Release/v1.1"
+    def GIT_REPO        = "/var/jenkins_home/workspace/PromoteToQA"
+    def GITHUB_CRED_ID  = "dbgithub"
+    def CURRENT_RELEASE = "release/v1.1"
     def DB_CRED_ID      = "7b99fc8f-179d-420d-bfd2-f5d79b27788c"
     def DB_SHARD        = "tamisin-sandbox"
     def LOCALPATH       = "${GIT_REPO}/Workspace"
+    def LOCALSRCPATH    = "${GIT_REPO}/Dbfs/Scala"
+    def LOCALPKGPATH    = "${GIT_REPO}/Dbfs/Scala/target/scala-2.12"
     def WORKSPACEPATH   = "/QA"
+    def DBFSPATH        = "/Libs"
     def TESTPATH        = "${GIT_REPO}/Validation/Tests"
     def OUTFILEPATH     = "Validation/Output"
     def SLACK_URL        = "https://hooks.slack.com/services/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"
@@ -13,13 +16,18 @@ node {
 
     stage('Synchronize Code') { // for display purposes
         echo "Pulling ${CURRENT_RELEASE} Branch from Github"
-        git branch: CURRENT_RELEASE, credentialsId: GITHUB_CRED_ID, url: 'https://github.com/tamisin-sandbox/databricks_cicd.git'
+        git branch: CURRENT_RELEASE, credentialsId: GITHUB_CRED_ID, url: 'https://github.com/tamisin-sandbox/cicd-demo.git'
     }
+    stage('Compile Changes') {
+        echo "Compiling..."
+        sh "cd ${LOCALSRCPATH};${tool name: 'sbt', type:'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt compile package"
+    }    
     stage('Deploy Changes') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DB_CRED_ID,
                                                                   usernameVariable: 'DB_USER',
                                                                   passwordVariable: 'DB_PASSWORD']]) {
             sh "python3 ${GIT_REPO}/Automation/Deployments/deploy.py  --shard=${DB_SHARD} --username=$DB_USER --password=$DB_PASSWORD --localpath=${LOCALPATH} --workspacepath=${WORKSPACEPATH}"
+            sh "python3 ${GIT_REPO}/Automation/Deployments/deploy_dbfs.py  --shard=${DB_SHARD} --username=$DB_USER --password=$DB_PASSWORD --localpath=${LOCALPKGPATH} --dbfspath=${DBFSPATH}/Scala"
         }
     }
     stage('Execute Tests') {
