@@ -104,7 +104,7 @@ def deploy(shard, username, password, notebooks):
                                  data=json.dumps(values), auth=(username, password))
             print(resp.json())
             print(resp.status_code)
-	    except:
+	except:
             print("Unexpected error:", sys.exc_info()[0])
             print('Not created. Already exists.')
 
