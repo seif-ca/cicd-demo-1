@@ -105,8 +105,8 @@ def deploy(shard, username, password, notebooks):
             print(resp.json())
             print(resp.status_code)
 	except:
-            print("Unexpected error:", sys.exc_info()[0])
-            print('Not created. Already exists.')
+		print("Unexpected error:", sys.exc_info()[0])
+		print('Not created. Already exists.')
 
         print(fullpath)
         if os.path.isfile(fullpath):
