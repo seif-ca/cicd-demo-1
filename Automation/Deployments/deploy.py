@@ -104,9 +104,9 @@ def deploy(shard, username, password, notebooks):
                                  data=json.dumps(values), auth=(username, password))
             print(resp.json())
             print(resp.status_code)
-	except:
-		print("Unexpected error:", sys.exc_info()[0])
-		print('Not created. Already exists.')
+		except:
+			print("Unexpected error:", sys.exc_info()[0])
+			print('Not created. Already exists.')
 
         print(fullpath)
         if os.path.isfile(fullpath):
