@@ -1,4 +1,4 @@
 # cicd-demo
 
 
-[![Build Status](https://ce113ce5.ngrok.io/buildStatus/icon?job=Pipeline-PromoteToQA)](https://ce113ce5.ngrok.io/job/Pipeline-PromoteToQA/)
+[![Build Status](http://ec2-34-219-254-193.us-west-2.compute.amazonaws.com:8080/job/PromoteToQA/badge/icon)](http://ec2-34-219-254-193.us-west-2.compute.amazonaws.com:8080/job/PromoteToQA/)
