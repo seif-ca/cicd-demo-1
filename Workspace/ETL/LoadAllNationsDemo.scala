@@ -41,7 +41,3 @@ joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 
 val allNations = sqlContext.sql("SELECT * from V_ALL_NATIONS v JOIN iso_country_codes i on upper(v.NationName) = upper(i.name)")
  display(allNations) 
-
-// COMMAND ----------
-
-allNations.write.csv("/tmp/foo.csv")
