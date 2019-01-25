@@ -33,13 +33,12 @@ val joinedDf = nationsDf.join(regionsDf, nationsDf("RegionKey") === regionsDf("R
 joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 // this is a test
 // This is a demo
+//again and again 12345
+// this is a test 123
+// tedt auto
 
 
 // COMMAND ----------
 
 val allNations = sqlContext.sql("SELECT * from V_ALL_NATIONS v JOIN iso_country_codes i on upper(v.NationName) = upper(i.name)")
  display(allNations) 
-
-// COMMAND ----------
-
-allNations.write.csv("/tmp/foo.csv")
