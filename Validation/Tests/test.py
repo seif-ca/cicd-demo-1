@@ -4,25 +4,10 @@ import glob
 import os
 
 
-
 class TestJobOutput(unittest.TestCase):
 
     test_output_path = '#ENV#'
 
-    def test_ml_model_accuracy(self):
-        '''
-        Todo: Use DB REST API to execute validation notebooks with asserts
-        '''
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
-
-
-    def test_allLookupsExist(self):
-        '''
-        Todo: Use  to connect to S3 and validate parquet files exists
-        '''
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
 
     def test_performance(self):
         path = self.test_output_path
@@ -52,7 +37,27 @@ class TestJobOutput(unittest.TestCase):
             statuses.append(status)
 
         self.assertFalse('FAILED' in statuses)
+        
+    def getSimilarProds(self):
+        # connect to shard using dbconnect
+        spark = SparkSession\
+                .builder\
+                .getOrCreate()
 
+        # The Spark code will execute on the Databricks cluster.
+        df = spark.sql("select * from product_similarity")
+
+        dfcnt = df.where(df['similarity_score'] > .5)
+
+        return dfcnt.count()
+
+    def test_SimilarProds(self):
+
+        val = self.getSimilarProds()
+        print(val)
+        self.assertGreater(val, 1, "Bad")        
+
+        
 if __name__ == '__main__':
     unittest.main()
 

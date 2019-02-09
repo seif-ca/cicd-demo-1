@@ -1,2 +1,3 @@
 // Databricks notebook source
-// MAGIC %r
+
+dbutils.widgets.text("org", "", "Organization")
