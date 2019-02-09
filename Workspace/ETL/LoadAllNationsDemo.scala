@@ -37,6 +37,7 @@ joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 // this is a test 123
 // tedt auto
 // another comment
+// 123
 
 
 // COMMAND ----------
