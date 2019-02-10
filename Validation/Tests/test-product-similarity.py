@@ -1,4 +1,5 @@
 import unittest
+from pyspark.sql import SparkSession
 
 class TestEtlResults(unittest.TestCase):
         
