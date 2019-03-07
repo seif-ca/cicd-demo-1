@@ -38,6 +38,10 @@ joinedDf.createOrReplaceTempView("V_ALL_NATIONS")
 // tedt auto
 // another comment
 // 123
+// another change
+// bl ablsdfsd
+// sdfsdfsdf
+// dsfdsfsdfsdf
 
 
 // COMMAND ----------
