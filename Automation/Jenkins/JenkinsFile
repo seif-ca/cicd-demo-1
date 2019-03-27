@@ -38,7 +38,10 @@ node {
         }
         sh "sed -i -e 's #ENV# ${GIT_REPO}/${OUTFILEPATH} g' ${TESTPATH}/test.py"
 
-        sh "python3 -m pytest --junit-xml=${GIT_REPO}/${OUTFILEPATH}/results.xml ${TESTPATH}/test.py || true"
+	sh '''
+	       conda activate dbconnect
+	       python3 -m pytest --junit-xml=${GIT_REPO}/${OUTFILEPATH}/results.xml ${TESTPATH}/test.py || true
+           '''
 
         sh "python3 ${GIT_REPO}/Automation/Deployments/notify.py --slackurl=${SLACK_URL} --message='${env.JOB_NAME}:Build-${env.BUILD_NUMBER}' --channel=${SLACK_CHANNEL} --outputpath=${GIT_REPO}/${OUTFILEPATH}"
 
