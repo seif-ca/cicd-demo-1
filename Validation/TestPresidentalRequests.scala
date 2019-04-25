@@ -1,5 +1,5 @@
 // Databricks notebook source
-// MAGIC %run "../ETL/PresidentialRequests"
+// %run "../ETL/PresidentialRequests"
 
 // COMMAND ----------
 
