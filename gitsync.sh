@@ -1,7 +1,7 @@
 git checkout develop
 
 git pull
-databricks workspace export_dir -o /DEVELOP .
+databricks workspace export_dir -o /Users/pete@tamisin.com/Demo ./Workspace
 
 dt=`date '+%Y-%m-%d %H:%M:%S'`
 msg_default="DB export on $dt"
