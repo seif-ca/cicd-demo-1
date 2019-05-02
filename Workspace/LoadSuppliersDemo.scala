@@ -16,4 +16,8 @@ val suppDf = sqlContext.read
 
 suppDf.createOrReplaceTempView("V_SUPPLIERS")
 
+/*
+this is a test
+*/
+
 display(suppDf)
