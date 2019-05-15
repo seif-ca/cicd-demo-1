@@ -105,7 +105,7 @@ def run(shard, username, password, sourcefiles, outfilepath):
         fulldbfspath = 'dbfs:' + dbfspath + '/' + nameonly
 
         print('Running job for:' + fulldbfspath)
-        values = {'run_name': name, 'existing_cluster_id': '0410-142436-shoos167', 'timeout_seconds': 3600, 'spark_python_task': {'python_file': fulldbfspath}}
+        values = {'run_name': name, 'existing_cluster_id': '0508-151648-banes1', 'timeout_seconds': 3600, 'spark_python_task': {'python_file': fulldbfspath}}
 
         resp = requests.post('https://' + shard + '.cloud.databricks.com/api/2.0/jobs/runs/submit',
                              data=json.dumps(values), auth=(username, password))

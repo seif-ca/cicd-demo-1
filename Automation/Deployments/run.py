@@ -104,7 +104,7 @@ def run(shard, username, password, notebooks, outfilepath):
         fullworkspacepath = workspacepath + '/' + name
 
         print('Running job for:' + fullworkspacepath)
-        values = {'run_name': name, 'existing_cluster_id': '0907-163941-coop741', 'timeout_seconds': 3600, 'notebook_task': {'notebook_path': fullworkspacepath}}
+        values = {'run_name': name, 'existing_cluster_id': '0508-151648-banes1', 'timeout_seconds': 3600, 'notebook_task': {'notebook_path': fullworkspacepath}}
 
         resp = requests.post('https://' + shard + '.cloud.databricks.com/api/2.0/jobs/runs/submit',
                              data=json.dumps(values), auth=(username, password))
